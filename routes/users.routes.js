@@ -10,9 +10,9 @@ const {
 const router = Router();
 
 router.get("/", usersList);
-router.post("/create", usersCreate);
-router.patch("/", usersUpdatePatch);
-router.put("/", usersUpdatePut);
-router.delete("/delete", usersDelete);
+router.post("/", usersCreate);
+router.patch("/:id", usersUpdatePatch);
+router.put("/:id", usersUpdatePut);
+router.delete("/:id", usersDelete);
 
 module.exports = router;
