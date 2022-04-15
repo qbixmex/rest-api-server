@@ -30,6 +30,10 @@ const UserSchema = Schema({
     type: Boolean,
     default: false
   },
+  created_at: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 module.exports = model('User', UserSchema);

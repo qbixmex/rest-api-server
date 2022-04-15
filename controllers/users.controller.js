@@ -1,4 +1,5 @@
 const { request, response } = require('express');
+const User = require('../models/user');
 
 const usersList = (req = request, res = response) => {
   const {
@@ -19,17 +20,16 @@ const usersList = (req = request, res = response) => {
   });
 };
 
-const usersCreate = (req = request, res = response) => {
-  const { id, first_name, last_name, age } = req.body;
+const usersCreate = async (req = request, res = response) => {
+  const body = req.body;
+
+  const user = new User(body);
+
+  await user.save();
 
   res.json({
-    msg: "Post Api - Controller",
-    body: {
-      id,
-      first_name,
-      last_name,
-      age
-    },
+    msg: "User Created Successfully",
+    user
   });
 }
 
