@@ -7,13 +7,19 @@ const {
   usersUpdatePatch,
   usersDelete
 } = require('../controllers/users.controller');
+const { inputValidation } = require('../middlewares/input-validation');
 
 const router = Router();
 
 router.get("/", usersList);
 
 router.post("/", [
-  check('email', 'Email is not valid!').isEmail()
+  check('name', 'Name is required!').not().isEmpty(),
+  check('password', 'Password is required!').not().isEmpty(),
+  check('password', 'Password must be between 6 to 18 characters!').isLength({ min: 6, max: 18 }),
+  check('email', 'Email is not valid!').isEmail(),
+  check('role', 'Is not a valid role!').isIn(['ADMIN_ROLE', 'USER_ROLE']),
+  inputValidation
 ], usersCreate);
 
 router.patch("/:id", usersUpdatePatch);
