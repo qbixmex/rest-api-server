@@ -1,0 +1,22 @@
+{
+  "name": "rest-server",
+  "version": "1.0.0",
+  "description": "This is a rest api web server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "javascript"
+  ],
+  "author": "Daniel González Briseño",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3"
+  },
+  "devDependencies": {}
+}
