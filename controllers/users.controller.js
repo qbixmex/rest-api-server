@@ -7,8 +7,16 @@ const usersList = (request, response) => {
 };
 
 const usersCreate = (request, response) => {
+  const { id, first_name, last_name, age } = request.body;
+
   response.json({
-    msg: "Post Api - Controller"
+    msg: "Post Api - Controller",
+    body: {
+      id,
+      first_name,
+      last_name,
+      age
+    }
   });
 }
 
