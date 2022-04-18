@@ -52,6 +52,7 @@ const usersCreate = async (req = request, res = response) => {
       image: user.image,
       role: user.role,
       status: user.status,
+      created_at: user.created_at
     }
   });
 
