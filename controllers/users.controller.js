@@ -52,7 +52,7 @@ const usersUpdatePut = (request, response) => {
 
 const usersUpdatePatch = async (request, response) => {
   const { id } = request.params;
-  const { password, google, email, ...rest } = request.body;
+  const { _id, password, google, email, ...rest } = request.body;
 
   if ( password ) {
     const salt = bcryptjs.genSaltSync();
