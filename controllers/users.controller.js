@@ -2,6 +2,7 @@ const { request, response } = require('express');
 const bcryptjs = require("bcryptjs");
 
 const User = require('../models/user');
+const bcrypt = require('bcryptjs/dist/bcrypt');
 
 const usersList = (req = request, res = response) => {
   const {
@@ -49,11 +50,20 @@ const usersUpdatePut = (request, response) => {
   });
 };
 
-const usersUpdatePatch = (request, response) => {
-  const id = request.params.id;
+const usersUpdatePatch = async (request, response) => {
+  const { id } = request.params;
+  const { password, google, email, ...rest } = request.body;
+
+  if ( password ) {
+    const salt = bcryptjs.genSaltSync();
+    rest.password = bcryptjs.hashSync(password, salt);
+  }
+
+  const user = await User.findByIdAndUpdate(id, rest, { new: true });
+
   response.json({
-    msg: "Patch Api - Controller",
-    id
+    msg: `User (${user.name}) updated successfully`,
+    user
   });
 };
 

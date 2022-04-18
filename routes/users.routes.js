@@ -9,7 +9,7 @@ const {
 } = require('../controllers/users.controller');
 const { inputValidation } = require('../middlewares/input-validation');
 
-const { isValidRole, emailExists } = require('../helpers/db-validators');
+const { emailExists } = require('../helpers/db-validators');
 
 const router = Router();
 
@@ -21,10 +21,9 @@ router.post("/", [
   check('password', 'Password must be between 6 to 18 characters!').isLength({ min: 6, max: 18 }),
   check('email', 'Email is not valid!').isEmail(),
   check('email').custom( emailExists ),
-  check('role').custom( isValidRole ),
+  check('email', 'Email is not valid!').isEmail(),
   inputValidation
 ], usersCreate);
-
 router.patch("/:id", usersUpdatePatch);
 router.put("/:id", usersUpdatePut);
 router.delete("/:id", usersDelete);
