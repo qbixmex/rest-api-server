@@ -5,15 +5,17 @@ const User = require('../models/user');
 
 const usersList = async (req = request, res = response) => {
   const { limit = 5, from = 0, order_by = "_id", asc = true } = req.query;
+  const query = { status: true };
 
-  const users = await User.find()
-    .limit(Number(limit))
-    .skip(Number(from))
-    .sort({ [order_by]: JSON.parse(asc) ? 1 : -1 })
+  const [count, users] = await Promise.all([
+    User.countDocuments(query),
+    await User.find(query)
+      .limit(Number(limit))
+      .skip(Number(from))
+      .sort({ [order_by]: JSON.parse(asc) ? 1 : -1 })
+  ]);
 
-  res.json({
-    users
-  });
+  res.json({ count, users });
 };
 
 const userData = async (req = request, res = response) => {
