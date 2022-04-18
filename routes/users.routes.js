@@ -21,6 +21,7 @@ router.get("/", usersList);
 
 router.get("/:id", [
   check('id', 'Is not a valid ID').isMongoId(),
+  check('id').custom( userExistsById ),
   inputValidation
 ], userData);
 
@@ -42,6 +43,10 @@ router.patch("/:id", [
   inputValidation
 ], usersUpdatePatch);
 
-router.delete("/:id", usersDelete);
+router.delete("/:id", [
+  check('id', 'Is not a valid ID').isMongoId(),
+  check('id').custom( userExistsById ),
+  inputValidation
+], usersDelete);
 
 module.exports = router;

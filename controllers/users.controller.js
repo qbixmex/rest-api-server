@@ -20,7 +20,7 @@ const usersList = async (req = request, res = response) => {
 
 const userData = async (req = request, res = response) => {
   const user = await User.findById(req.params.id);
-  return res.json({ user });
+  return res.json(user.status ? user : null);
 };
 
 const usersCreate = async (req = request, res = response) => {
@@ -53,12 +53,14 @@ const usersUpdatePatch = async (req = request, res = response) => {
   res.json(user);
 };
 
-const usersDelete = (request, response) => {
-  const id = request.params.id;
-  response.json({
-    msg: "Delete Api - Controller",
-    id
-  });
+const usersDelete = async (req = request, res = response) => {
+  // To delete Phisically
+  // const user = await User.findByIdAndDelete(req.params.id);
+
+  // Just Update status property
+  const user = await User.findByIdAndUpdate(req.params.id, { status: false }, { new: true });
+
+  res.json(user);
 };
 
 module.exports = {
