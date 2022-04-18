@@ -2,24 +2,17 @@ const { request, response } = require('express');
 const bcryptjs = require("bcryptjs");
 
 const User = require('../models/user');
-const bcrypt = require('bcryptjs/dist/bcrypt');
 
-const usersList = (req = request, res = response) => {
-  const {
-    name,
-    apiKey = null,
-    enabled = false,
-    page = 1,
-    limit = 10
-  } = req.query;
+const usersList = async (req = request, res = response) => {
+  const { limit = 5, from = 0, order_by = "_id", asc = true } = req.query;
+
+  const users = await User.find()
+    .limit(Number(limit))
+    .skip(Number(from))
+    .sort({ [order_by]: JSON.parse(asc) ? 1 : -1 })
 
   res.json({
-    msg: "Get Api - Controller",
-    name,
-    apiKey: Number(apiKey),
-    enabled: Boolean(enabled),
-    page: +page,
-    limit: +limit
+    users
   });
 };
 
@@ -35,24 +28,13 @@ const usersCreate = async (req = request, res = response) => {
   // Save to database
   await user.save();
 
-  res.json({
-    msg: "User Created Successfully",
-    user
-  });
+  res.json(user);
 
 }
 
-const usersUpdatePut = (request, response) => {
-  const id = request.params.id;
-  response.json({
-    msg: "Put Api - Controller",
-    id
-  });
-};
-
-const usersUpdatePatch = async (request, response) => {
-  const { id } = request.params;
-  const { _id, password, google, email, ...rest } = request.body;
+const usersUpdatePatch = async (req = request, res = response) => {
+  const { id } = req.params;
+  const { _id, password, google, email, ...rest } = req.body;
 
   if ( password ) {
     const salt = bcryptjs.genSaltSync();
@@ -61,10 +43,7 @@ const usersUpdatePatch = async (request, response) => {
 
   const user = await User.findByIdAndUpdate(id, rest, { new: true });
 
-  response.json({
-    msg: `User (${user.name}) updated successfully`,
-    user
-  });
+  res.json(user);
 };
 
 const usersDelete = (request, response) => {
@@ -78,7 +57,6 @@ const usersDelete = (request, response) => {
 module.exports = {
   usersList,
   usersCreate,
-  usersUpdatePut,
   usersUpdatePatch,
   usersDelete,
 };
