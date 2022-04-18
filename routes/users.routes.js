@@ -2,6 +2,7 @@ const { Router } = require('express');
 const { check } = require('express-validator');
 const {
   usersList,
+  userData,
   usersCreate,
   usersUpdatePatch,
   usersDelete
@@ -17,6 +18,11 @@ const {
 const router = Router();
 
 router.get("/", usersList);
+
+router.get("/:id", [
+  check('id', 'Is not a valid ID').isMongoId(),
+  inputValidation
+], userData);
 
 router.post("/", [
   check('name', 'Name is required!').not().isEmpty(),

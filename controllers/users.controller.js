@@ -16,6 +16,11 @@ const usersList = async (req = request, res = response) => {
   });
 };
 
+const userData = async (req = request, res = response) => {
+  const user = await User.findById(req.params.id);
+  return res.json({ user });
+};
+
 const usersCreate = async (req = request, res = response) => {
   const { name, email, password, image, role } = req.body;
 
@@ -56,6 +61,7 @@ const usersDelete = (request, response) => {
 
 module.exports = {
   usersList,
+  userData,
   usersCreate,
   usersUpdatePatch,
   usersDelete,
