@@ -35,4 +35,4 @@ YARN: ```yarn start```
 
 ### Heroku logs
 
-```heroku logs -n 100```
+```heroku logs -n 100 --tail```
