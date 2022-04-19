@@ -54,14 +54,14 @@ const usersUpdatePatch = async (req = request, res = response) => {
 };
 
 const usersDelete = async (req = request, res = response) => {
-  // To delete Phisically
-  // const user = await User.findByIdAndDelete(req.params.id);
-
   // Just Update status property
-  // const user = await User.findByIdAndUpdate(req.params.id, { status: false }, { new: true });
+  const user = await User.findByIdAndUpdate(req.params.id, { status: false }, { new: true });
 
-  // res.json(user);
-  res.json({ uid: req.uid });
+  // Get authenticated user from request
+  const authenticatedUser = req.user;
+
+  // Respond json with deleted and authenticated user
+  res.json(user);
 };
 
 module.exports = {

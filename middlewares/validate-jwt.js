@@ -1,7 +1,9 @@
 const { request, response } = require('express');
 const jwt = require('jsonwebtoken');
 
-const jwtValidate = (req = request, res = response, next ) => {
+const User = require('../models/user');
+
+const jwtValidate = async (req = request, res = response, next ) => {
   const token = req.header('x-token');
 
   if (!token) {
@@ -11,13 +13,31 @@ const jwtValidate = (req = request, res = response, next ) => {
   }
 
   try {
-    // If token is valid, payload is provided
-    const payload = jwt.verify(token, process.env.SECRET_KEY);
 
-    // Save Uid from payload to the request.
-    req.uid = payload.uid;
-    
+    // If token is valid, payload is provided
+    const { uid } = jwt.verify(token, process.env.SECRET_KEY);
+
+    // Find user with uid
+    const user = await User.findById(uid);
+
+    if (!user) {
+      return res.status(401).json({
+        msg: 'Invalid Token - user does not exist!'
+      });
+    }
+
+    // Verify if uid has state equals to true
+    if (!user.status) {
+      return res.status(401).json({
+        msg: 'Invalid Token - deleted user!'
+      });
+    }
+
+    // Set authenticated user to the request.
+    req.user = user;
+
     next();
+
   } catch (error) {
     console.log(error);
     res.status(401).json({
