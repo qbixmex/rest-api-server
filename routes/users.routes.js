@@ -1,5 +1,7 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
+
+// Controllers
 const {
   usersList,
   userData,
@@ -7,7 +9,9 @@ const {
   usersUpdatePatch,
   usersDelete
 } = require('../controllers/users.controller');
-const { inputValidation } = require('../middlewares/input-validation');
+
+// Validation Middlewares
+const { jwtValidate } = require('../middlewares/validate-jwt');
 
 const {
   emailExists,
@@ -15,6 +19,9 @@ const {
   isValidRole
 } = require('../helpers/db-validators');
 
+const { inputValidation } = require('../middlewares/input-validation');
+
+// Routes
 const router = Router();
 
 router.get("/", usersList);
@@ -44,6 +51,7 @@ router.patch("/:id", [
 ], usersUpdatePatch);
 
 router.delete("/:id", [
+  jwtValidate,
   check('id', 'Is not a valid ID').isMongoId(),
   check('id').custom( userExistsById ),
   inputValidation
