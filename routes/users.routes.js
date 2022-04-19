@@ -12,7 +12,7 @@ const {
 
 // Validation Middlewares
 const { jwtValidate } = require('../middlewares/validate-jwt');
-const { isAdminRole } = require('../middlewares/validate-roles')
+const { isAdminRole, hasRole } = require('../middlewares/validate-roles')
 
 const {
   emailExists,
@@ -40,7 +40,7 @@ router.get("/:id", [
 
 router.post("/", [
   jwtValidate,
-  isAdminRole,
+  hasRole('ADMIN_ROLE'),
   check('name', 'Name is required!').not().isEmpty(),
   check('password', 'Password is required!').not().isEmpty(),
   check('password', 'Password must be between 6 to 18 characters!').isLength({ min: 6, max: 18 }),
@@ -53,7 +53,7 @@ router.post("/", [
 
 router.patch("/:id", [
   jwtValidate,
-  isAdminRole,
+  hasRole('ADMIN_ROLE'),
   check('id', 'Is not a valid ID').isMongoId(),
   check('id').custom( userExistsById ),
   check('role').custom(isValidRole),

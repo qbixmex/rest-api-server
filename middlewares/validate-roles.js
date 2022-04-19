@@ -18,4 +18,22 @@ const isAdminRole = (req = request, res = response, next) => {
   next();
 };
 
-module.exports = { isAdminRole };
+const hasRole = (...roles) => {
+  return (req = request, res = response, next) => {
+    if (!req.user) {
+      return res.status(500).json({
+        msg: 'Cannot verify admin role because is not a valid authenticated user!'
+      });
+    }
+
+    if ( !roles.includes(req.user.role) ) {
+      return res.status(401).json({
+        msg: `Service require the following roles (${ roles })`
+      });
+    }
+
+    next();
+  }
+};
+
+module.exports = { isAdminRole, hasRole };
