@@ -11,16 +11,18 @@ const {
 } = require('../controllers/users.controller');
 
 // Validation Middlewares
-const { jwtValidate } = require('../middlewares/validate-jwt');
-const { isAdminRole, hasRole } = require('../middlewares/validate-roles')
+const {
+  jwtValidate,
+  isAdminRole,
+  hasRole,
+  inputValidation,
+} = require('../middlewares');
 
 const {
   emailExists,
   userExistsById,
   isValidRole
 } = require('../helpers/db-validators');
-
-const { inputValidation } = require('../middlewares/input-validation');
 
 // Routes
 const router = Router();

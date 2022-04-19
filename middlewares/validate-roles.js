@@ -36,4 +36,7 @@ const hasRole = (...roles) => {
   }
 };
 
-module.exports = { isAdminRole, hasRole };
+module.exports = {
+  isAdminRole,
+  hasRole
+};
