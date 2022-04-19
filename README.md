@@ -15,3 +15,20 @@ YARN: ```yarn dev```
 NPM: ```npm start```
 
 YARN: ```yarn start```
+
+## Heroku
+
+### Check environment variables in console
+
+```heroku config```
+
+### Set a new environment variable
+```heroku config:set test="lorem ipsum"```
+
+### Unset a new environment variable
+
+```heroku config:unset test```
+
+### Deploy to heroku
+
+```git push heroku master```
