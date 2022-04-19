@@ -32,3 +32,7 @@ YARN: ```yarn start```
 ### Deploy to heroku
 
 ```git push heroku master```
+
+### Heroku logs
+
+```heroku logs -n 100```
