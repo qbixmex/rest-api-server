@@ -55,19 +55,46 @@ const googleSignIn = async (req = request, res = response) => {
   try {
     const { name, picture, email } = await googleVerify(id_token);
 
+    // Check if user already exists in DB
+    let user = await User.findOne({ email });
+
+    if ( !user ) {
+      // Create User
+      const data = {
+        name,
+        email,
+        password: ':P',
+        image: picture,
+        role: 'USER_ROLE',
+        google: true,
+      }
+
+      user = new User( data );
+      await user.save();
+    }
+
+    if (!user.status) {
+      return res.status(401).json({
+        msg: 'User Blocked, Contact Site Administrator!',
+      });
+    }
+
+    // Generate JSON Web Token
+    const token = await generateJWT( user.id );
+
     res.json({
-      ok: true,
-      name,
-      img: picture,
-      email
+      user,
+      token
     });
 
   } catch (error) {
+
     return res.status(400).json({
       ok: false,
       msg: 'Token could not be verified!',
       error
     });
+
   }
   
 };
