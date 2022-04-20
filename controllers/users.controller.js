@@ -3,13 +3,13 @@ const bcryptjs = require("bcryptjs");
 
 const User = require('../models/user');
 
-const usersList = async (req = request, res = response) => {
+const list = async (req = request, res = response) => {
   const { limit = 5, from = 0, order_by = "_id", asc = true } = req.query;
   const query = { status: true };
 
   const [count, users] = await Promise.all([
     User.countDocuments(query),
-    await User.find(query)
+    User.find(query)
       .limit(Number(limit))
       .skip(Number(from))
       .sort({ [order_by]: JSON.parse(asc) ? 1 : -1 })
@@ -18,12 +18,12 @@ const usersList = async (req = request, res = response) => {
   res.json({ count, users });
 };
 
-const userData = async (req = request, res = response) => {
+const show = async (req = request, res = response) => {
   const user = await User.findById(req.params.id);
   return res.json(user.status ? user : null);
 };
 
-const usersCreate = async (req = request, res = response) => {
+const store = async (req = request, res = response) => {
   const { name, email, password, image, role } = req.body;
 
   const user = new User({ name, email, password, image, role });
@@ -39,7 +39,7 @@ const usersCreate = async (req = request, res = response) => {
 
 }
 
-const usersUpdatePatch = async (req = request, res = response) => {
+const update = async (req = request, res = response) => {
   const { id } = req.params;
   const { _id, password, google, email, ...rest } = req.body;
 
@@ -53,21 +53,21 @@ const usersUpdatePatch = async (req = request, res = response) => {
   res.json(user);
 };
 
-const usersDelete = async (req = request, res = response) => {
+const destroy = async (req = request, res = response) => {
   // Just Update status property
   const user = await User.findByIdAndUpdate(req.params.id, { status: false }, { new: true });
 
   // Get authenticated user from request
-  const authenticatedUser = req.user;
+  // const authenticatedUser = req.user;
 
   // Respond json with deleted and authenticated user
   res.json(user);
 };
 
 module.exports = {
-  usersList,
-  userData,
-  usersCreate,
-  usersUpdatePatch,
-  usersDelete,
+  list,
+  show,
+  store,
+  update,
+  destroy,
 };

@@ -2,23 +2,29 @@ const { request, response } = require('express');
 
 const { Category } = require('../models');
 
-const categoriesList = async (req = request, res = response) => {
+const list = async (req = request, res = response) => {
+  const { limit = 10, from = 0, order_by = '_id', asc= true } = req.query;
   const query = { status: true };
 
-  const [ count, categories ] = await Promise.all([
+  const [ total, categories ] = await Promise.all([
     Category.countDocuments(query),
-    await Category.find(query)
+    Category.find(query)
+      .limit(Number(limit))
+      .skip(Number(from))
+      .sort({ [order_by]: JSON.parse(asc) ? 1 : -1 })
+      .populate('user', 'name')
   ]);
   
-  res.json({ count, categories });
+  res.json({ total, categories });
 };
 
-const categoryData = (req = request, res = response) => {
-  res.json({ route: 'Category List', id: req.params.id });
+const show = async (req = request, res = response) => {
+  const category = await Category.findById(req.params.id).populate('user', 'name');
+  res.json(category.status ? category : null);
 };
 
-const categoryCreate = async (req = request, res = response) => {
-  const name = req.body.name.toUpperCase();
+const store = async (req = request, res = response) => {
+  const name = req.body.name.toLowerCase();
 
   // Check if category is already exists
   const categoryDB = await Category.findOne({ name });
@@ -36,7 +42,7 @@ const categoryCreate = async (req = request, res = response) => {
   };
 
   // Create Category Object
-  const category = await new Category(data);
+  const category = await new Category(data).populate('user', 'name');
 
   // Save to DB
   category.save();  
@@ -45,18 +51,40 @@ const categoryCreate = async (req = request, res = response) => {
   res.status(201).json(category);
 };
 
-const categoryUpdate = (req = request, res = response) => {
-  res.json({ route: 'Category Update', id: req.params.id });
+const update = async (req = request, res = response) => {
+  const { id } = req.params;
+  const {_id, status, user, ...data } = req.body;
+
+  const category = await Category.findById(id).populate('user', 'name');
+
+  // Check is category is not deleted
+  if ( !category.status ) {
+    return res.status(404).json({
+      msg: 'Category not found'
+    })
+  }
+
+  category.name = data.name.toLowerCase();
+
+  // Update Database
+  category.save();
+
+  res.json(category);
 };
 
-const categoryDelete = (req = request, res = response) => {
-  res.json({ route: 'Category Delete', id: req.params.id });
+const destroy = async (req = request, res = response) => {
+  // Update status property
+  const category = await Category
+    .findByIdAndUpdate(req.params.id, { status: false }, { new: true })
+    .populate('user', 'name');
+
+  res.json(category);
 };
 
 module.exports = {
-  categoriesList,
-  categoryData,
-  categoryCreate,
-  categoryUpdate,
-  categoryDelete
+  list,
+  show,
+  store,
+  update,
+  destroy
 };

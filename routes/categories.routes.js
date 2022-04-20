@@ -4,45 +4,65 @@ const { check } = require('express-validator');
 // Validation Middlewares
 const {
   jwtValidate,
+  isAdminRole,
   inputValidation,
 } = require('../middlewares');
 
+const {
+  CategoryExistsById
+} = require('../helpers/db-validators');
+
 // Controllers
 const {
-  categoriesList,
-  categoryData,
-  categoryCreate,
-  categoryUpdate,
-  categoryDelete
+  list,
+  show,
+  store,
+  update,
+  destroy
 } = require('../controllers/categories.controller');
 
 // Routes
 const router = Router();
 
+/** LIST */
 router.get("/", [
   jwtValidate,
   inputValidation
-], categoriesList);
+], list);
 
+/** SHOW */
 router.get("/:id", [
   jwtValidate,
+  check('id', 'Is not a valid ID').isMongoId(),
+  check('id').custom( CategoryExistsById ),
   inputValidation
-], categoryData);
+], show);
 
+/** STORE */
 router.post("/", [
   jwtValidate,
+  isAdminRole,
   check('name', 'Name is required').not().isEmpty(),
   inputValidation
-], categoryCreate);
+], store);
 
+/** UPDATE */
 router.patch("/:id", [
   jwtValidate,
+  isAdminRole,
+  check('id', 'Is not a valid ID').isMongoId(),
+  check('id').custom( CategoryExistsById ),
+  check('name', 'Name is required').not().isEmpty(),
   inputValidation
-], categoryUpdate);
+], update);
 
+/** DESTROY */
 router.delete("/:id", [
   jwtValidate,
+  isAdminRole,
+  check('id', 'Is not a valid ID').isMongoId(),
+  check('id').custom( CategoryExistsById ),
   inputValidation
-], categoryDelete);
+], destroy);
 
 module.exports = router;
