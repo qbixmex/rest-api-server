@@ -8,7 +8,7 @@ const jwtValidate = async (req = request, res = response, next ) => {
 
   if (!token) {
     return res.status(401).json({
-      msg: 'No Token was provided in the request'
+      msg: 'No token has been provided'
     })
   }
 

@@ -36,3 +36,17 @@ YARN: ```yarn start```
 ### Heroku logs
 
 ```heroku logs -n 100 --tail```
+
+## MongoDB
+
+### Start Server
+
+Mac ```brew services start mongodb-community```
+
+### Stop Server
+
+Mac ```brew services stop mongodb-community```
+
+### Restart Server
+
+Mac ```brew services restart mongodb-community```
