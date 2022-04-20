@@ -31,6 +31,7 @@ router.get("/:id", [
 
 router.post("/", [
   jwtValidate,
+  check('name', 'Name is required').not().isEmpty(),
   inputValidation
 ], categoryCreate);
 
