@@ -9,9 +9,9 @@ const { jwtValidate, isAdminRole } = require('../middlewares');
 const router = Router();
 
 // Upload
-router.post('/', /*[
+router.post('/', [
   jwtValidate,
   isAdminRole
-], */loadFile);
+], loadFile);
 
 module.exports = router;
