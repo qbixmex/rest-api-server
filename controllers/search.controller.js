@@ -129,7 +129,7 @@ const searchUsers = async (searchTerm, res) => {
     const categories = await Category.find({ name: regex, status: true });
 
     if (!categories.length) {
-      return res.status(400).json({ msg: `There's no results with (${searchTerm}) search term!` });
+      return res.status(404).json({ msg: `There's no results with (${searchTerm}) search term!` });
     }
 
     const products = await Product.find({
