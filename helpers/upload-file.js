@@ -32,7 +32,7 @@ const uploadFile = (files, validExtensions = [ 'jpg', 'jpeg', 'png', 'gif' ], fo
     // Perform file uploading
     file.mv(uploadPath, error => {
       if ( error ) return reject(error);
-      resolve(file.name);
+      resolve(uniqueFileName);
     });
   });
 };
