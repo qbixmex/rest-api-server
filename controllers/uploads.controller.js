@@ -1,5 +1,6 @@
 const path = require('path');
 const { response, request } = require('express');
+const { v4: uuidv4 } = require('uuid');
 
 const loadFile = (req = request, res = response) => {
   // Check if no files were provided
@@ -24,8 +25,11 @@ const loadFile = (req = request, res = response) => {
     });
   };
 
+  // Unique File Name with UUID
+  const uniqueFileName = uuidv4() + '.' + extension; 
+
   // Path where to upload file
-  const uploadPath = path.join(__dirname, '../uploads/', file.name);
+  const uploadPath = path.join(__dirname, '../uploads/', uniqueFileName);
 
   // Perform file uploading
   file.mv(uploadPath, error => {
