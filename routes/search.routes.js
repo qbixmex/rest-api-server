@@ -13,6 +13,6 @@ const {
 // Routes
 const router = Router();
 
-router.get('/', jwtValidate, search);
+router.get('/:collection/:searchterm', jwtValidate, search);
 
 module.exports = router;
