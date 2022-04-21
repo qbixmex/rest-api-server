@@ -61,7 +61,7 @@ const update = async (req = request, res = response) => {
   if ( !category.status ) {
     return res.status(404).json({
       msg: 'Category not found'
-    })
+    });
   }
 
   category.name = data.name.toLowerCase();
