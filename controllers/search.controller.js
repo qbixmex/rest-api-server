@@ -8,6 +8,7 @@ const allowedCollection = [
   'users',
   'categories',
   'products',
+  'products-category',
   'roles'
 ];
 
@@ -72,15 +73,18 @@ const searchUsers = async (searchTerm, res) => {
  */
  const searchProducts = async (searchTerm, res) => {
   const isMongoID = ObjectId.isValid( searchTerm );
-
+  
   // Check if is a valid mongodb id
   if (isMongoID) {
     const product = await Product
       .findById(searchTerm)
       .select('name price description available')
       .populate('category', 'name');
+    
+    if (product) {
+      return res.json({ results: (product) ? [product] : [] });
+    }
 
-    return res.json({ results: (product) ? [product] : [] })
   }
 
   // Regular Expression case insensitive
@@ -88,12 +92,57 @@ const searchUsers = async (searchTerm, res) => {
 
   // Search in database
   const products = await Product
-    .find({ name: regex, status: true })
+    .find({
+      $or: [ { name: regex } ],
+      $and: [ { status: true }]
+    })
     .select('name price description available')
     .populate('category', 'name');
 
-  // Respon as json users results
-  res.json({ results: products })
+  if (products) {
+    // Respon as json users results
+    return res.json({ results: products });
+  }
+};
+
+/**
+ * Search products by category search term.
+ * @param {string} searchTerm search term from client
+ * @param {e.Response<any, Record<string, any>>} res ExpressJs Response
+ * @return {Promise<void>} A Promise Response with Status 200 and JSON Body
+ */
+ const searchProductsByCategory = async (searchTerm, res) => {
+  try {
+    const isMongoID = ObjectId.isValid( searchTerm );
+
+    // Check if is a valid mongodb id
+    if (isMongoID) {
+      const products = await Product
+        .find({ category: ObjectId(searchTerm), status: true })
+        .select('name price description available')
+        .populate('category', 'name');
+      return res.json({ results: products })
+    }
+
+    const regex = new RegExp( searchTerm, 'i');
+
+    const categories = await Category.find({ name: regex, status: true });
+
+    if (!categories.length) {
+      return res.status(400).json({ msg: `There's no results with (${searchTerm}) search term!` });
+    }
+
+    const products = await Product.find({
+      $or: [...categories.map( c => ({ category: c._id }) )],
+      $and: [ { status: true } ]
+    })
+      .select('name price description available')
+      .populate('category', 'name');
+
+    res.json({ results: products });
+  } catch (error) {
+    res.status(400).json(error);
+  }
 };
 
 const search = (req = request, res = response) => {
@@ -107,7 +156,7 @@ const search = (req = request, res = response) => {
 
   switch (collection) {
     case 'users':
-      searchUsers(searchTerm, res)
+      searchUsers(searchTerm, res);
       break;
 
     case 'categories':
@@ -116,6 +165,10 @@ const search = (req = request, res = response) => {
 
     case 'products':      
       searchProducts(searchTerm, res);
+      break;
+
+    case 'products-category':
+      searchProductsByCategory(searchTerm, res);
       break;
 
       case 'roles':
