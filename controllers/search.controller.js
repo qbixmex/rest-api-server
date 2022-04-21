@@ -20,10 +20,23 @@ const allowedCollection = [
 const searchUsers = async (searchterm, res) => {
   const isMongoID = ObjectId.isValid( searchterm );
 
+  // Check if is a valid mongodb id
   if (isMongoID) {
     const user = await User.findById(searchterm);
-    res.json({ results: (user) ? [user] : [] })
+    return res.json({ results: (user) ? [user] : [] })
   }
+
+  // Regular Expression case insensitive
+  const regex = new RegExp(searchterm, 'i');
+
+  // Search in database
+  const users = await User.find({
+    $or: [ { name: regex }, { email: regex }, { role: regex } ],
+    $and: [ { status: true } ]
+  });
+
+  // Respon as json users results
+  res.json({ results: users })
 };
 
 const search = (req = request, res = response) => {
