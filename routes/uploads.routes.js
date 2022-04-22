@@ -5,6 +5,7 @@ const { check } = require('express-validator');
 const {
   loadFile,
   updateImage,
+  showImage,
 } = require('../controllers/uploads.controller');
 
 const {
@@ -26,7 +27,7 @@ router.post('/', [
   fileValidation,
 ], loadFile);
 
-/** Upload User Profile Image */
+/** Upload Image */
 router.patch('/:collection/:id', [
   jwtValidate,
   isAdminRole,
@@ -36,5 +37,13 @@ router.patch('/:collection/:id', [
   fileValidation,
   inputValidation
 ], updateImage);
+
+/** View Image */
+router.get('/:collection/:id', [
+  check('id', 'Id must be a valid mongo id').isMongoId(),
+  check('collection')
+    .custom( c => allowedCollection(c, ['users', 'products']) ),
+  inputValidation
+], showImage);
 
 module.exports = router;
