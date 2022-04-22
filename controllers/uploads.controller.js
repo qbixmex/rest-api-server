@@ -3,12 +3,6 @@ const { uploadFile } = require('../helpers');
 const { User, Product } = require('../models');
 
 const loadFile = async (req = request, res = response) => {
-  // Check if no files were provided
-  if (!req.files || Object.keys(req.files).length === 0 || !req.files.file) {
-    res.status(400).send('No files were uploaded.');
-    return;
-  }
-
   try {
     const filename = await uploadFile(req.files);
     res.json({ filename });
@@ -43,11 +37,6 @@ const updateImage = async (req = request, res = response) => {
   
     default:
       return res.status(500).json({ msg: 'I forgot to validate collection'});
-  }
-
-  if(!req.files) {
-    res.status(400).json({ msg: 'No image was provided' });
-    return;
   }
 
   // Upload file to disk.

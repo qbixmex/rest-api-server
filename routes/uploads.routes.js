@@ -11,6 +11,7 @@ const {
   jwtValidate,
   isAdminRole,
   inputValidation,
+  fileValidation,
 } = require('../middlewares');
 
 const { allowedCollection } = require('../helpers');
@@ -21,7 +22,8 @@ const router = Router();
 /** Upload File */
 router.post('/', [
   jwtValidate,
-  isAdminRole
+  isAdminRole,
+  fileValidation,
 ], loadFile);
 
 /** Upload User Profile Image */
@@ -30,7 +32,8 @@ router.patch('/:collection/:id', [
   isAdminRole,
   check('id', 'Id must be a valid mongo id').isMongoId(),
   check('collection')
-    .custom( c => allowedCollection(c, ['users', 'products']) ),
+  .custom( c => allowedCollection(c, ['users', 'products']) ),
+  fileValidation,
   inputValidation
 ], updateImage);
 
