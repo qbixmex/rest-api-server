@@ -30,11 +30,26 @@ const ProductIsNotDeleted = async ( id = '' ) => {
   if ( !product.status ) throw new Error(`Product no longer exists!`);
 };
 
+/**
+ * Check is collection given is valid.
+ * @param {string} collection Collection to evaluate
+ * @param {string[]} collections Allowed Collections
+ * @returns {boolean} A boolean if current collection is allowed
+ */
+const allowedCollection = (collection, collections) => {
+  const isIncluded = collections.includes(collection);
+  if ( !isIncluded ) {
+    throw new Error(`Collection ${collection} is not allowed, only ${collections} are allowed`)
+  }
+  return true;
+};
+
 module.exports = {
   isValidRole,
   emailExists,
   userExistsById,
   CategoryExistsById,
   ProductExistsById,
-  ProductIsNotDeleted
+  ProductIsNotDeleted,
+  allowedCollection
 };
