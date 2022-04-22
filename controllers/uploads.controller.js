@@ -1,3 +1,5 @@
+const path = require('path');
+const fs = require('fs');
 const { response, request } = require('express');
 const { uploadFile } = require('../helpers');
 const { User, Product } = require('../models');
@@ -37,6 +39,16 @@ const updateImage = async (req = request, res = response) => {
   
     default:
       return res.status(500).json({ msg: 'I forgot to validate collection'});
+  }
+
+  // Delete previous image
+  if ( model.image ) {
+    // Delete disk image
+    const imagePath = path.join( __dirname, '../uploads', collection, model.image );
+
+    if ( fs.existsSync(imagePath) ) {
+      fs.unlinkSync(imagePath);
+    }
   }
 
   // Upload file to disk.
