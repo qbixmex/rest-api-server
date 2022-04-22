@@ -92,17 +92,22 @@ const showImage = async (req = request, res = response) => {
       return res.status(500).json({ msg: 'I forgot to validate collection'});
   }
 
-  // Delete previous image
+  // Check if image exists in DB
   if ( model.image ) {
-    // Delete disk image
+    // Make image path
     const imagePath = path.join( __dirname, '../uploads', collection, model.image );
 
+    // Check if image exists in disk
     if ( fs.existsSync(imagePath) ) {
+      // return image path
       return res.sendFile( imagePath );
     }
   }
 
-  res.json({ msg: `No placeholder was found` });
+  // Make image path
+  const imagePath = path.join( __dirname, '../assets/no-image.jpg' );
+
+  res.status(404).sendFile( imagePath );
 };
 
 module.exports = {
