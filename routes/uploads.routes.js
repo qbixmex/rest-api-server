@@ -4,7 +4,7 @@ const { check } = require('express-validator');
 // Controllers
 const {
   loadFile,
-  updateImage,
+  updateImageCloudinary,
   showImage,
 } = require('../controllers/uploads.controller');
 
@@ -36,7 +36,7 @@ router.patch('/:collection/:id', [
   .custom( c => allowedCollection(c, ['users', 'products']) ),
   fileValidation,
   inputValidation
-], updateImage);
+], updateImageCloudinary);
 
 /** View Image */
 router.get('/:collection/:id', [

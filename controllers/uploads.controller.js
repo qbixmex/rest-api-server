@@ -3,6 +3,9 @@ const fs = require('fs');
 const { response, request } = require('express');
 const { uploadFile } = require('../helpers');
 const { User, Product } = require('../models');
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config( process.env.CLOUDINARY_URL );
 
 const loadFile = async (req = request, res = response) => {
   try {
@@ -64,6 +67,56 @@ const updateImage = async (req = request, res = response) => {
   res.json( model );
 };
 
+const updateImageCloudinary = async (req = request, res = response) => {
+  const { collection, id } = req.params;
+
+  let model;
+
+  switch (collection) {
+    case 'users':
+      model = await User.findById(id);
+      if (!model) {
+        return res.status(400).json({
+          msg: `No user with ID: (${id}) was founded`
+        });
+      }
+    break;
+
+    case 'products':
+      model = await Product.findById(id);
+      if (!model) {
+        return res.status(400).json({
+          msg: `No product with ID: (${id}) was founded`
+        });
+      }
+    break;
+  
+    default:
+      return res.status(500).json({ msg: 'I forgot to validate collection'});
+  }
+
+  // Delete previous image
+  if ( model.image ) {
+    // Delete disk image
+    // TODO: Clean Image
+  }
+
+  // Extract from file object temporary file path
+  const { tempFilePath } = req.files.file;
+
+  // Upload file to cloudinary.
+  const { secure_url } = await cloudinary.uploader.upload( tempFilePath );
+
+  // Set image name to model
+  model.image = secure_url
+
+  // Save to database
+  await model.save();
+
+  // Respond model as JSON
+  res.json( model );
+};
+
 const showImage = async (req = request, res = response) => {
   const { id, collection } = req.params;
 
@@ -113,5 +166,6 @@ const showImage = async (req = request, res = response) => {
 module.exports = {
   loadFile,
   updateImage,
+  updateImageCloudinary,
   showImage
 };
