@@ -4,6 +4,8 @@ const cloudinary = require('cloudinary').v2;
 
 cloudinary.config( process.env.CLOUDINARY_URL );
 
+const { deleteImage } = require('../helpers');
+
 const User = require('../models/user');
 
 const list = async (req = request, res = response) => {
@@ -60,7 +62,7 @@ const destroy = async (req = request, res = response) => {
   // Destructure id from params
   const { id } = req.params;
 
-  const [ { image }, deletedUser ] = await Promise.all([
+  const [ { image: imagePath }, deletedUser ] = await Promise.all([
     User.findById(id).select('image'),
     User.findByIdAndUpdate(id, {
       status: false,
@@ -69,12 +71,7 @@ const destroy = async (req = request, res = response) => {
   ]);
 
   // Delete image from cloudinary
-  if ( image ) {
-    const nameArray = image.split('/');
-    const name = nameArray[ nameArray.length - 1 ];
-    const [ public_id ] = name.split('.');
-    cloudinary.uploader.destroy( public_id );
-  }
+  deleteImage(imagePath);
 
   // Respond json with deleted user
   res.json(deletedUser);

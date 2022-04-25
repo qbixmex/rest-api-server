@@ -34,7 +34,7 @@ const searchUsers = async (searchTerm, res) => {
   const users = await User.find({
     $or: [ { name: regex }, { email: regex }, { role: regex } ],
     $and: [ { status: true } ]
-  });
+  }).select('uid name email image role');
 
   // Respon as json users results
   res.json({ results: users })
@@ -78,7 +78,7 @@ const searchUsers = async (searchTerm, res) => {
   if (isMongoID) {
     const product = await Product
       .findById(searchTerm)
-      .select('name price description available')
+      .select('name price description available image')
       .populate('category', 'name');
     
     if (product) {
@@ -96,7 +96,7 @@ const searchUsers = async (searchTerm, res) => {
       $or: [ { name: regex } ],
       $and: [ { status: true }]
     })
-    .select('name price description available')
+    .select('name price description available image')
     .populate('category', 'name');
 
   if (products) {
@@ -119,7 +119,7 @@ const searchUsers = async (searchTerm, res) => {
     if (isMongoID) {
       const products = await Product
         .find({ category: ObjectId(searchTerm), status: true })
-        .select('name price description available')
+        .select('name price description available image')
         .populate('category', 'name');
       return res.json({ results: products })
     }
@@ -136,7 +136,7 @@ const searchUsers = async (searchTerm, res) => {
       $or: [...categories.map( c => ({ category: c._id }) )],
       $and: [ { status: true } ]
     })
-      .select('name price description available')
+      .select('name price description available image')
       .populate('category', 'name');
 
     res.json({ results: products });

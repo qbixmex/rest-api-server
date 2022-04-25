@@ -4,6 +4,8 @@ const cloudinary = require('cloudinary').v2;
 
 cloudinary.config( process.env.CLOUDINARY_URL );
 
+const { deleteImage } = require('../helpers');
+
 /** LIST */
 const list = async (req = request, res = response) => {
   const { limit = 10, from = 0, order_by = '_id', asc= true } = req.query;
@@ -86,7 +88,7 @@ const destroy = async (req = request, res = response) => {
   // Destructure id from params
   const { id } = req.params;
 
-  const [ { image }, productUpdated ] = await Promise.all([
+  const [ { image: imagePath }, productUpdated ] = await Promise.all([
     Product.findById(id).select('image'),
     Product.findByIdAndUpdate(id, {
       status: false,
@@ -97,13 +99,7 @@ const destroy = async (req = request, res = response) => {
   ]);
 
   // Delete image from cloudinary
-  if ( image ) {
-    // Delete image from cloudinary
-    const nameArray = image.split('/');
-    const name      = nameArray[ nameArray.length - 1 ];
-    const [ public_id ] = name.split('.');
-    cloudinary.uploader.destroy( public_id );    
-  }
+  deleteImage(imagePath);
 
   res.json({ productUpdated });
 };
