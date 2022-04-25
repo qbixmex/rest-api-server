@@ -97,8 +97,11 @@ const updateImageCloudinary = async (req = request, res = response) => {
 
   // Delete previous image
   if ( model.image ) {
-    // Delete disk image
-    // TODO: Clean Image
+    // Delete image from cloudinary
+    const nameArray = model.image.split('/');
+    const name      = nameArray[ nameArray.length - 1 ];
+    const [ public_id ] = name.split('.');
+    cloudinary.uploader.destroy( public_id );
   }
 
   // Extract from file object temporary file path
@@ -147,14 +150,8 @@ const showImage = async (req = request, res = response) => {
 
   // Check if image exists in DB
   if ( model.image ) {
-    // Make image path
-    const imagePath = path.join( __dirname, '../uploads', collection, model.image );
-
-    // Check if image exists in disk
-    if ( fs.existsSync(imagePath) ) {
-      // return image path
-      return res.sendFile( imagePath );
-    }
+    // return image path
+    return res.json({ image: model.image });
   }
 
   // Make image path
