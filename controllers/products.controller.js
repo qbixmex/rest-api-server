@@ -1,5 +1,8 @@
 const { response, request } = require('express');
 const { Product } = require('../models');
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config( process.env.CLOUDINARY_URL );
 
 /** LIST */
 const list = async (req = request, res = response) => {
@@ -80,15 +83,29 @@ const update = async (req = request, res = response) => {
 
 /** DESTROY */
 const destroy = async (req = request, res = response) => {
-  // Update status property
-  const product = await Product
-    .findByIdAndUpdate(req.params.id, { status: false }, { new: true })
-    .populate([
-      { path: 'user', select: 'name' },
-      { path: 'category', select: 'name' }
-    ]);
+  // Destructure id from params
+  const { id } = req.params;
 
-  res.json(product);
+  const [ { image }, productUpdated ] = await Promise.all([
+    await Product.findById(id).select('image'),
+    Product.findByIdAndUpdate(id, {
+      status: false,
+      image: '',
+      available: false,
+      updated_at: new Date()
+    }, { new: true })
+  ]);
+
+  // Delete image from cloudinary
+  if ( image ) {
+    // Delete image from cloudinary
+    const nameArray = image.split('/');
+    const name      = nameArray[ nameArray.length - 1 ];
+    const [ public_id ] = name.split('.');
+    cloudinary.uploader.destroy( public_id );    
+  }
+
+  res.json({ productUpdated });
 };
 
 module.exports = {
