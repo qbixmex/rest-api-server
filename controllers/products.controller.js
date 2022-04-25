@@ -87,7 +87,7 @@ const destroy = async (req = request, res = response) => {
   const { id } = req.params;
 
   const [ { image }, productUpdated ] = await Promise.all([
-    await Product.findById(id).select('image'),
+    Product.findById(id).select('image'),
     Product.findByIdAndUpdate(id, {
       status: false,
       image: '',

@@ -1,5 +1,8 @@
 const { request, response } = require('express');
 const bcryptjs = require("bcryptjs");
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config( process.env.CLOUDINARY_URL );
 
 const User = require('../models/user');
 
@@ -54,14 +57,27 @@ const update = async (req = request, res = response) => {
 };
 
 const destroy = async (req = request, res = response) => {
-  // Just Update status property
-  const user = await User.findByIdAndUpdate(req.params.id, { status: false }, { new: true });
+  // Destructure id from params
+  const { id } = req.params;
 
-  // Get authenticated user from request
-  // const authenticatedUser = req.user;
+  const [ { image }, deletedUser ] = await Promise.all([
+    User.findById(id).select('image'),
+    User.findByIdAndUpdate(id, {
+      status: false,
+      image: ''
+    }, { new: true })
+  ]);
 
-  // Respond json with deleted and authenticated user
-  res.json(user);
+  // Delete image from cloudinary
+  if ( image ) {
+    const nameArray = image.split('/');
+    const name = nameArray[ nameArray.length - 1 ];
+    const [ public_id ] = name.split('.');
+    cloudinary.uploader.destroy( public_id );
+  }
+
+  // Respond json with deleted user
+  res.json(deletedUser);
 };
 
 module.exports = {
