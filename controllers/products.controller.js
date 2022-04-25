@@ -88,20 +88,24 @@ const destroy = async (req = request, res = response) => {
   // Destructure id from params
   const { id } = req.params;
 
-  const [ { image: imagePath }, productUpdated ] = await Promise.all([
-    Product.findById(id).select('image'),
-    Product.findByIdAndUpdate(id, {
-      status: false,
-      image: '',
-      available: false,
-      updated_at: new Date()
-    }, { new: true })
-  ]);
+  // Get product from database
+  const product = await Product.findById(id)
+    .select('name price description available image');
 
   // Delete image from cloudinary
-  deleteImage(imagePath);
+  deleteImage( product.image );
 
-  res.json({ productUpdated });
+  // Update properties
+  product.set({
+    status: false,
+    image: '',
+    available: false,
+    updated_at: new Date()
+  });
+
+  await product.save()
+
+  res.json(product);
 };
 
 module.exports = {
