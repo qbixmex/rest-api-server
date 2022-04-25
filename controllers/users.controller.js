@@ -62,19 +62,20 @@ const destroy = async (req = request, res = response) => {
   // Destructure id from params
   const { id } = req.params;
 
-  const [ { image: imagePath }, deletedUser ] = await Promise.all([
-    User.findById(id).select('image'),
-    User.findByIdAndUpdate(id, {
-      status: false,
-      image: ''
-    }, { new: true })
-  ]);
+  // Get user from database
+  const user = await User.findById(id)
+    .select('name email image role');
 
+  
   // Delete image from cloudinary
-  deleteImage(imagePath);
+  deleteImage(user.image);
 
-  // Respond json with deleted user
-  res.json(deletedUser);
+  // Update properties
+  user.set({ status: false, image: '' });
+
+  await user.save()
+
+  res.json(user);
 };
 
 module.exports = {
